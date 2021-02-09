@@ -1,0 +1,27 @@
+echo "##########################################################"
+echo "# Check scan status - passed/failed/inprogress"
+echo "##########################################################"
+n=0
+until [ $n -ge 30 ]
+do
+  echo "Getting status... $n"
+  echo "Curling <REST APi URL>"
+  res=$(curl <REST APi URL>)
+  res1=$(echo $res|python -c 'import sys, json; print json.load(sys.stdin)["data"]["tags"][0]["scan_status"]')
+  echo "Scan status is $res1"
+  if [[ "$res1" == "passed" ]];then
+    echo "Json Response:";echo $res
+  	exit 0
+  elif [[ "$res1" == "failed" ]];then
+    echo "Json Response:";echo $res
+    echo "Retrying..."
+  	#exit 1
+  fi
+  n=$[$n+1]
+  sleep 60
+  echo "=========================================="
+done
+  
+echo "Script timed out"
+echo "Last Json Response:";echo $res
+exit 1
